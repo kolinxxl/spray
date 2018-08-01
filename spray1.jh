@@ -1,0 +1,112 @@
+
+/**
+ * Entita Task.
+ * @author Petr Kolinsky.
+ */
+entity ChemProstredek {
+	nazev String required
+}
+
+entity ChemPomer {
+	procento Short required
+}
+
+relationship OneToOne {
+	ChemPomer{prostredek} to ChemProstredek
+}
+
+entity ChemSmes {
+	nazev String  required
+}
+
+relationship ManyToMany {
+	ChemSmes{slozeni} to ChemPomer
+}
+
+entity Vozidlo {
+id String,
+typ String,
+nazev String,
+}
+
+entity KategorieVozidla {
+    nazev String
+}
+
+relationship ManyToOne {
+	Vozidlo{kategorie} to KategorieVozidla
+}
+
+entity Zamestnanec {
+	id String,
+    jmeno String,
+    prijmeni String,
+    telefon String,
+    aktivni Boolean
+}
+
+enum Role {
+	RIDIC, TECHNIK, DISPECER
+}
+
+relationship OneToMany {
+	Vozidlo{ridic} to Zamestnanec 
+}
+
+relationship ManyToMany {
+	Vozidlo{ridici} to Zamestnanec
+    Zamestnanec{role} to Role
+}
+
+entity Pozemek {
+	nazev String,
+    vymera Float
+}
+
+entity Aktivita {
+	nazev String
+}
+
+enum StavUkolu {
+	AKTIVNI, SPLNENY, ODLOZENY
+}
+
+entity Ukol {
+	priorita Integer,
+    datumVytvoreni Instant,
+    provestDne Instant,
+	splneny Boolean
+}
+
+relationship ManyToOne {
+	Ukol{aktivita} to Aktivita
+	Ukol{ridic} to Zamestnanec
+    Ukol{vozidlo} to Vozidlo
+    Ukol{smes} to ChemSmes
+    Ukol{pozemek} to Pozemek
+	Ukol{stav} to StavUkolu
+}
+
+
+entity HistorieUkolu {
+	zmena String
+}
+
+relationship ManyToOne {
+	HistorieUkolu{ukol} to Ukol
+}
+
+
+// an ignored comment
+/** not an ignored comment */
+
+// Set pagination options
+paginate HistorieUkolu, Zamestnanec with infinite-scroll
+paginate Ukol with pagination
+
+dto * with mapstruct
+
+// Set service options to all except few
+service all with serviceImpl except Zamestnanec, Pozemek
+// Set an angular suffix
+angularSuffix * with mySuffix
